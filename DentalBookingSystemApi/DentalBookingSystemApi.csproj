@@ -11,4 +11,11 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Endpoints\NewFolder\Clinics\" />
+    <Folder Include="Endpoints\NewFolder\OpeningHours\" />
+    <Folder Include="Endpoints\NewFolder\Treatments\" />
+    <Folder Include="Endpoints\Patients\" />
+  </ItemGroup>
+
 </Project>
