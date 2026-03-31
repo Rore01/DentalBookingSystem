@@ -1,3 +1,10 @@
 ﻿global using Microsoft.EntityFrameworkCore;
 global using DentalBookingSystemApi.Database;
 global using DentalBookingSystemApi.Models;
+global using DentalBookingSystemApi.Common;
+global using DentalBookingSystemApi.Endpoints;
+global using DentalBookingSystemApi.Hubs;
+global using DentalBookingSystemApi.Endpoints.Clinics;
+global using DentalBookingSystemApi.Endpoints.OpeningHours;
+global using DentalBookingSystemApi.Endpoints.Patients;
+global using DentalBookingSystemApi.Endpoints.Treatments;

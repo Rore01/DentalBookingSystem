@@ -1,7 +1,3 @@
-using DentalBookingSystemApi.Common;
-using DentalBookingSystemApi.Endpoints;
-using DentalBookingSystemApi.Hubs;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Database 

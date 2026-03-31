@@ -1,8 +1,4 @@
-﻿using DentalBookingSystemApi.Endpoints.Clinics;
-using DentalBookingSystemApi.Endpoints.Patients;
-using DentalBookingSystemApi.Endpoints.Treatments;
-
-namespace DentalBookingSystemApi.Endpoints;
+﻿namespace DentalBookingSystemApi.Endpoints;
 
 public static class EndpointRegister
 {
@@ -26,5 +22,9 @@ public static class EndpointRegister
         new GetAllTreatments().MapEndpoint(app);
         new UpdateTreatment().MapEndpoint(app);
         new DeleteTreatment().MapEndpoint(app);
+
+        // Opening Hours
+        new GetOpeningHours().MapEndpoint(app);
+        new SetOpeningHours().MapEndpoint(app);
     }
 }
