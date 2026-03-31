@@ -1,4 +1,6 @@
+using DentalBookingSystemApi.Common;
 using DentalBookingSystemApi.Endpoints;
+using DentalBookingSystemApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,11 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.CustomSchemaIds(type => type.FullName);
 });
+
+builder.Services.AddSignalR();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddHostedService<ReminderBackgroundService>();
+
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -25,5 +32,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 EndpointRegister.MapAllEndpoints(app);
+
+app.MapHub<BookingHub>("/hubs/booking");
 
 app.Run();

@@ -32,7 +32,6 @@
     <Folder Include="Endpoints\BlockedSlots\" />
     <Folder Include="Endpoints\Availability\" />
     <Folder Include="Endpoints\OpeningHours\" />
-    <Folder Include="Endpoints\Treatments\" />
   </ItemGroup>
 
 </Project>
