@@ -1,4 +1,6 @@
-﻿namespace DentalBookingSystemApi.Endpoints;
+﻿using DentalBookingSystemApi.Endpoints.Availability;
+
+namespace DentalBookingSystemApi.Endpoints;
 
 public static class EndpointRegister
 {
@@ -26,5 +28,9 @@ public static class EndpointRegister
         // Opening Hours
         new GetOpeningHours().MapEndpoint(app);
         new SetOpeningHours().MapEndpoint(app);
+
+        // Availability
+        new GetAvailableDates().MapEndpoint(app);
+        new GetAvailableTimeSlots().MapEndpoint(app);
     }
 }

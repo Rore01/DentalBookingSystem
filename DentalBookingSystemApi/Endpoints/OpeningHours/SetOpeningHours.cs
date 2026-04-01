@@ -1,7 +1,4 @@
-﻿using DentalBookingSystemApi.Database;
-using Microsoft.EntityFrameworkCore;
-
-namespace DentalBookingSystemApi.Endpoints.OpeningHours;
+﻿namespace DentalBookingSystemApi.Endpoints.OpeningHours;
 
 public class SetOpeningHours : IEndpointMapper
 {
@@ -19,7 +16,6 @@ public class SetOpeningHours : IEndpointMapper
         AppDbContext db,
         CancellationToken ct)
     {
-        // Remove existing opening hours for this clinic and replace with new ones
         var existing = await db.OpeningHours
             .Where(o => o.ClinicId == req.ClinicId)
             .ToListAsync(ct);
