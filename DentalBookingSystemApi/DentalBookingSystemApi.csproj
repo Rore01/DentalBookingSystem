@@ -30,7 +30,6 @@
   <ItemGroup>
     <Folder Include="Endpoints\Bookings\" />
     <Folder Include="Endpoints\BlockedSlots\" />
-    <Folder Include="Endpoints\Availability\" />
   </ItemGroup>
 
 </Project>

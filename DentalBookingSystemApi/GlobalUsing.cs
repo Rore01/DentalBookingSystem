@@ -8,3 +8,5 @@ global using DentalBookingSystemApi.Endpoints.Clinics;
 global using DentalBookingSystemApi.Endpoints.OpeningHours;
 global using DentalBookingSystemApi.Endpoints.Patients;
 global using DentalBookingSystemApi.Endpoints.Treatments;
+global using DentalBookingSystemApi.Endpoints.Availability;
+global using DentalBookingSystemApi.Endpoints.BlockedSlots;
