@@ -1,4 +1,5 @@
-﻿global using Microsoft.EntityFrameworkCore;
+﻿global using Microsoft.AspNetCore.SignalR;
+global using Microsoft.EntityFrameworkCore;
 global using DentalBookingSystemApi.Database;
 global using DentalBookingSystemApi.Models;
 global using DentalBookingSystemApi.Common;
@@ -10,3 +11,4 @@ global using DentalBookingSystemApi.Endpoints.Patients;
 global using DentalBookingSystemApi.Endpoints.Treatments;
 global using DentalBookingSystemApi.Endpoints.Availability;
 global using DentalBookingSystemApi.Endpoints.BlockedSlots;
+global using DentalBookingSystemApi.Endpoints.Bookings;

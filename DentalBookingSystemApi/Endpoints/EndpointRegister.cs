@@ -35,5 +35,10 @@ public static class EndpointRegister
         new CreateBlockedSlot().MapEndpoint(app);
         new GetBlockedSlots().MapEndpoint(app);
         new DeleteBlockedSlot().MapEndpoint(app);
+
+        // Bookings
+        new CreateBooking().MapEndpoint(app);
+        new GetBooking().MapEndpoint(app);
+        new GetAllBookings().MapEndpoint(app);
     }
 }
