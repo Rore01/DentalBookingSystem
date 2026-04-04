@@ -40,5 +40,8 @@ public static class EndpointRegister
         new CreateBooking().MapEndpoint(app);
         new GetBooking().MapEndpoint(app);
         new GetAllBookings().MapEndpoint(app);
+        new UpdateBooking().MapEndpoint(app);
+        new CancelBooking().MapEndpoint(app);
+        new GetBookingsByPatient().MapEndpoint(app);
     }
 }
