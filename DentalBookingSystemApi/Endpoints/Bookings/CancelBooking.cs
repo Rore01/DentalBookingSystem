@@ -1,11 +1,4 @@
-﻿using DentalBookingSystemApi.Common;
-using DentalBookingSystemApi.Hubs;
-using DentalBookingSystemApi.Database;
-using DentalBookingSystemApi.Models;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-
-namespace DentalBookingSystemApi.Endpoints.Bookings;
+﻿namespace DentalBookingSystemApi.Endpoints.Bookings;
 
 public class CancelBooking : IEndpointMapper
 {
@@ -32,7 +25,6 @@ public class CancelBooking : IEndpointMapper
         booking.Status = BookingStatus.Cancelled;
         await db.SaveChangesAsync(ct);
 
-        // Notify all clients — this slot is now free again
         try
         {
             await hub.Clients

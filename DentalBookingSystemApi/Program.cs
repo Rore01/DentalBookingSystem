@@ -1,34 +1,58 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Database 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
+builder.Services
+    .AddFluentEmail(builder.Configuration["Email:From"])
+    .AddLiquidRenderer()
+    .AddSmtpSender(new System.Net.Mail.SmtpClient
+    {
+        Host = builder.Configuration["Email:SmtpHost"]!,
+        Port = int.Parse(builder.Configuration["Email:SmtpPort"]!),
+        EnableSsl = true,
+        Credentials = new System.Net.NetworkCredential(
+            builder.Configuration["Email:Username"],
+            builder.Configuration["Email:Password"]
+        )
+    });
+
+builder.Services.AddScoped<EmailService>();
+
+builder.Services.AddSignalR();
+
+builder.Services.AddHostedService<ReminderBackgroundService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:5004", "https://localhost:7240")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
 builder.Services.AddSwaggerGen(options =>
 {
     options.CustomSchemaIds(type => type.FullName);
 });
 
-builder.Services.AddSignalR();
-builder.Services.AddScoped<EmailService>();
-builder.Services.AddHostedService<ReminderBackgroundService>();
-
-builder.Services.AddOpenApi();
-
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.MapOpenApi();
-}
-
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
-
-EndpointRegister.MapAllEndpoints(app);
+app.UseCors();
 
 app.MapHub<BookingHub>("/hubs/booking");
+
+EndpointRegister.MapAllEndpoints(app);
 
 app.Run();

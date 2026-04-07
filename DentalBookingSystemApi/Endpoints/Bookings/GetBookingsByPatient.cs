@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace DentalBookingSystemApi.Endpoints.Bookings;
+﻿namespace DentalBookingSystemApi.Endpoints.Bookings;
 
 public class GetBookingsByPatient : IEndpointMapper
 {
