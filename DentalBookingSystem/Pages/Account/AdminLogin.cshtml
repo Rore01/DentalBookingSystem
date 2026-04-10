@@ -1,0 +1,59 @@
+@page
+@model DentalBookingSystem.Pages.Account.AdminLoginModel
+@{
+    ViewData["Title"] = "Clinic Admin Login";
+    ViewData["ActivePage"] = "";
+    Layout = "_Layout";
+}
+
+<style>
+    body { background: linear-gradient(135deg, #0f2027 0%, #1a7a6e 100%); min-height: 100vh; }
+    .auth-wrapper { min-height: calc(100vh - 64px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+    .auth-card { background: white; border-radius: 20px; padding: 40px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .auth-logo { font-family: 'Playfair Display', serif; font-size: 24px; text-align: center; margin-bottom: 8px; color: #0f2027; }
+    .auth-logo span { color: #2aa896; }
+    .auth-badge { display: inline-block; background: #fff0e8; color: #c97a2a; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; }
+    .auth-subtitle { text-align: center; color: #8a9aa5; font-size: 14px; margin-bottom: 32px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #2c3e50; }
+    .form-group input { width: 100%; padding: 12px 14px; border: 1px solid #dde4e8; border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; transition: border-color .2s; outline: none; }
+    .form-group input:focus { border-color: #2aa896; }
+    .auth-btn { width: 100%; background: #0f2027; color: white; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .2s; }
+    .auth-btn:hover { background: #1a7a6e; }
+    .auth-footer { text-align: center; margin-top: 24px; font-size: 13px; color: #8a9aa5; }
+    .auth-footer a { color: #1a7a6e; text-decoration: none; font-weight: 600; }
+    .error-msg { background: #fef0f0; border: 1px solid #f5c6c6; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #e05a5a; margin-bottom: 20px; }
+</style>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div style="text-align:center;margin-bottom:12px;">
+            <span class="auth-badge">🏥 CLINIC ADMIN</span>
+        </div>
+        <div class="auth-logo">Denta<span>Care</span></div>
+        <div class="auth-subtitle">Sign in to manage your clinic</div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="error-msg">⚠️ @Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+            <div class="form-group">
+                <label asp-for="Input.Email">Clinic Email</label>
+                <input asp-for="Input.Email" type="email" placeholder="clinic@example.com" autocomplete="email" />
+                <span asp-validation-for="Input.Email" style="color:#e05a5a;font-size:12px;"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Password">Password</label>
+                <input asp-for="Input.Password" type="password" placeholder="••••••••" autocomplete="current-password" />
+                <span asp-validation-for="Input.Password" style="color:#e05a5a;font-size:12px;"></span>
+            </div>
+            <button type="submit" class="auth-btn">Sign In to Dashboard →</button>
+        </form>
+
+        <div class="auth-footer">
+            Patient? <a asp-page="/Account/Login">Sign in here</a>
+        </div>
+    </div>
+</div>

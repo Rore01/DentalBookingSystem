@@ -1,0 +1,85 @@
+@page
+@model DentalBookingSystem.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Create Account";
+    ViewData["ActivePage"] = "";
+    Layout = "_Layout";
+}
+
+<style>
+    body { background: linear-gradient(135deg, #0f2027 0%, #2c4a52 100%); min-height: 100vh; }
+    .auth-wrapper { min-height: calc(100vh - 64px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+    .auth-card { background: white; border-radius: 20px; padding: 40px; width: 100%; max-width: 460px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .auth-logo { font-family: 'Playfair Display', serif; font-size: 24px; text-align: center; margin-bottom: 8px; color: #0f2027; }
+    .auth-logo span { color: #2aa896; }
+    .auth-subtitle { text-align: center; color: #8a9aa5; font-size: 14px; margin-bottom: 32px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #2c3e50; }
+    .form-group input { width: 100%; padding: 12px 14px; border: 1px solid #dde4e8; border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; transition: border-color .2s; outline: none; }
+    .form-group input:focus { border-color: #2aa896; }
+    .form-group .hint { font-size: 11px; color: #8a9aa5; margin-top: 4px; }
+    .auth-btn { width: 100%; background: #1a7a6e; color: white; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .2s; }
+    .auth-btn:hover { background: #2aa896; }
+    .auth-footer { text-align: center; margin-top: 24px; font-size: 13px; color: #8a9aa5; }
+    .auth-footer a { color: #1a7a6e; text-decoration: none; font-weight: 600; }
+    .error-msg { background: #fef0f0; border: 1px solid #f5c6c6; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #e05a5a; margin-bottom: 20px; }
+    .success-msg { background: #e8f5f0; border: 1px solid #a8dbc9; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #1a7a6e; margin-bottom: 20px; }
+    .optional-tag { color: #8a9aa5; font-weight: 400; font-size: 11px; margin-left: 4px; }
+</style>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-logo">Denta<span>Care</span></div>
+        <div class="auth-subtitle">Create your free account to book appointments</div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="error-msg">⚠️ @Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.FirstName">First Name</label>
+                    <input asp-for="Input.FirstName" placeholder="Anna" autocomplete="given-name" />
+                    <span asp-validation-for="Input.FirstName" style="color:#e05a5a;font-size:12px;"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.LastName">Last Name</label>
+                    <input asp-for="Input.LastName" placeholder="Lindgren" autocomplete="family-name" />
+                    <span asp-validation-for="Input.LastName" style="color:#e05a5a;font-size:12px;"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Email">Email address</label>
+                <input asp-for="Input.Email" type="email" placeholder="you@example.com" autocomplete="email" />
+                <span asp-validation-for="Input.Email" style="color:#e05a5a;font-size:12px;"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Phone">Phone <span class="optional-tag">(optional)</span></label>
+                <input asp-for="Input.Phone" type="tel" placeholder="+46 70 123 4567" autocomplete="tel" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Password">Password</label>
+                <input asp-for="Input.Password" type="password" placeholder="At least 6 characters" autocomplete="new-password" />
+                <span asp-validation-for="Input.Password" style="color:#e05a5a;font-size:12px;"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <input asp-for="Input.ConfirmPassword" type="password" placeholder="Repeat your password" autocomplete="new-password" />
+                <span asp-validation-for="Input.ConfirmPassword" style="color:#e05a5a;font-size:12px;"></span>
+            </div>
+
+            <button type="submit" class="auth-btn">Create Account →</button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a asp-page="/Account/Login">Sign in</a>
+        </div>
+    </div>
+</div>

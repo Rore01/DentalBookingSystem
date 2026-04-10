@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -7,24 +7,47 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦷</text></svg>" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/dental.css" asp-append-version="true" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
 
-    <nav class="main-nav">
-        <a class="logo" asp-page="/Index">Denta<span>Care</span></a>
+<nav class="main-nav">
+    <a class="logo" asp-page="/Index">Denta<span>Care</span></a>
         <div class="nav-links">
             <a asp-page="/Index" class="@(ViewData["ActivePage"]?.ToString() == "Home" ? "active" : "")">Home</a>
-            <a asp-page="/Book" class="@(ViewData["ActivePage"]?.ToString() == "Book" ? "active" : "")">Book Appointment</a>
+            @if (User.FindFirst("Role")?.Value == "Admin")
+            {
+                <a asp-page="/Admin/Dashboard">Dashboard</a>
+                <a asp-page="/Book" class="@(ViewData["ActivePage"]?.ToString() == "Book" ? "active" : "")">Book Appointment</a>
+            }
+            else
+            {
+                <a asp-page="/Services" class="@(ViewData["ActivePage"]?.ToString() == "Services" ? "active" : "")">Services</a>
+                <a asp-page="/Book" class="@(ViewData["ActivePage"]?.ToString() == "Book" ? "active" : "")">Book Appointment</a>
+            }
         </div>
         <div class="nav-right">
-            <a asp-page="/Account/Login" class="nav-login">Log in</a>
-            <a asp-page="/Book" class="btn-sm">Book Now →</a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                @if (User.FindFirst("Role")?.Value != "Admin")
+                {
+                    <a asp-page="/MyBookings" class="nav-login">My Bookings</a>
+                }
+                <form asp-page="/Account/Logout" method="post" style="display:inline">
+                    <button type="submit" class="btn-sm">Log out</button>
+                </form>
+            }
+            else
+            {
+                <a asp-page="/Account/Login" class="nav-login">Log in</a>
+                <a asp-page="/Book" class="btn-sm">Book Now →</a>
+            }
         </div>
-    </nav>
+</nav>
 
-    @RenderBody()
+@RenderBody()
 
-    @await RenderSectionAsync("Scripts", required: false)
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

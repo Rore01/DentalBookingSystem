@@ -1,10 +1,111 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
+    ViewData["ActivePage"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!--  HERO  -->
+<div class="hero">
+    <div>
+        <div class="hero-tag">🦷 ONLINE BOOKING AVAILABLE</div>
+        <h1>Your smile,<br>booked in <em>minutes.</em></h1>
+        <p>Find available times, choose your treatment, and confirm your visit — all without a single phone call. Reminders included.</p>
+        <div class="hero-btns">
+            <a asp-page="/Book" class="btn-primary">Book an Appointment</a>
+            @if (User.FindFirst("Role")?.Value == "Admin")
+            {
+                <a asp-page="/Admin/Dashboard" class="btn-outline">Dashboard →</a>
+            }
+            else
+            {
+                <a asp-page="/Services" class="btn-outline">View Services →</a>
+            }
+        </div>
+    </div>
+    <div class="hero-card">
+        <h3>⚡ Quick Booking Steps</h3>
+        <div class="quick-book-step">
+            <div class="step-num">1</div>
+            <div class="step-info">
+                <span>Choose Treatment</span>
+                <small>Cleaning, whitening, filling…</small>
+            </div>
+        </div>
+        <div class="quick-book-step">
+            <div class="step-num">2</div>
+            <div class="step-info">
+                <span>Pick a Date & Time</span>
+                <small>Only available slots shown</small>
+            </div>
+        </div>
+        <div class="quick-book-step">
+            <div class="step-num">3</div>
+            <div class="step-info">
+                <span>Confirm & Done</span>
+                <small>Email confirmation sent instantly</small>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-val">98%</div>
+                <div class="hero-stat-label">Patient satisfaction</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-val">24h</div>
+                <div class="hero-stat-label">Reminder sent</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-val">0 calls</div>
+                <div class="hero-stat-label">Needed to book</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  SERVICES STRIP  -->
+<div class="services-strip">
+    <h2 class="services-strip-title">Our Treatments</h2>
+    <p class="services-strip-sub">Professional dental care tailored to your needs</p>
+
+    @if (Model.Treatments.Any())
+    {
+        @foreach (var treatment in Model.Treatments)
+        {
+            <a asp-page="/Book" asp-route-treatmentId="@treatment.Id" class="service-item @(treatment.IsFeatured ? "featured" : "")">
+                <div class="service-icon">@treatment.Icon</div>
+                <h4>@treatment.Name</h4>
+                <div class="price">@treatment.Price.ToString("N0") kr</div>
+                <div class="duration">⏱ @treatment.DurationMinutes min</div>
+            </a>
+        }
+    }
+    else
+    {
+        <!-- Fallback static cards if API is unavailable -->
+        <a asp-page="/Book" class="service-item">
+            <div class="service-icon">🔍</div>
+            <h4>Dental Checkup</h4>
+            <div class="price">650 kr</div>
+            <div class="duration">⏱ 30 min</div>
+        </a>
+        <a asp-page="/Book" class="service-item featured">
+            <div class="service-icon">✨</div>
+            <h4>Teeth Whitening</h4>
+            <div class="price">2 400 kr</div>
+            <div class="duration">⏱ 60 min</div>
+        </a>
+        <a asp-page="/Book" class="service-item">
+            <div class="service-icon">🛡️</div>
+            <h4>Tooth Filling</h4>
+            <div class="price">1 100 kr</div>
+            <div class="duration">⏱ 45 min</div>
+        </a>
+        <a asp-page="/Book" class="service-item">
+            <div class="service-icon">🦷</div>
+            <h4>Root Canal</h4>
+            <div class="price">4 800 kr</div>
+            <div class="duration">⏱ 90 min</div>
+        </a>
+    }
 </div>
