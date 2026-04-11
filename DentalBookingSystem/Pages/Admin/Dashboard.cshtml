@@ -1,0 +1,220 @@
+@page
+@model DentalBookingSystem.Pages.Admin.DashboardModel
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "_Layout";
+
+    var clinicName = User.FindFirst("ClinicName")?.Value ?? "Clinic";
+    var greeting = DateTime.Now.Hour < 12 ? "Good morning" : DateTime.Now.Hour < 17 ? "Good afternoon" : "Good evening";
+}
+
+<style>
+    body { background: var(--cream); }
+    .admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .admin-sidebar { background: var(--dark); padding: 28px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .admin-logo { font-size: 22px; font-weight: 700; color: white; padding: 0 24px 4px; font-family: 'Playfair Display', serif; }
+    .admin-role { font-size: 11px; color: rgba(255,255,255,0.35); padding: 0 24px 28px; letter-spacing: .5px; }
+    .admin-nav { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; }
+    .admin-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 500; text-decoration: none; transition: all .15s; }
+    .admin-nav a:hover { background: rgba(255,255,255,0.07); color: white; }
+    .admin-nav a.active { background: rgba(42,168,150,0.2); color: #2aa896; }
+    .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 24px; border-top: 1px solid rgba(255,255,255,0.07); margin-top: 16px; }
+    .upcoming-list { padding: 0 20px 20px; }
+    .upcoming-item { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid #f5f5f5; align-items: center; }
+    .upcoming-time { background: var(--mint); color: var(--teal); border-radius: 8px; padding: 8px 10px; text-align: center; font-size: 11px; font-weight: 700; min-width: 52px; line-height: 1.3; }
+    .upcoming-info span { font-size: 13px; font-weight: 600; display: block; }
+    .upcoming-info small { color: var(--muted); font-size: 11px; }
+    .mini-calendar-card { background: white; border-radius: 14px; border: 1px solid #e8edf0; overflow: hidden; margin-bottom: 16px; }
+    .mini-cal-body { padding: 20px; }
+    .mini-weekdays { display: grid; grid-template-columns: repeat(7,1fr); text-align: center; font-size: 10px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    .mini-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+    .mini-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:12px; border-radius:6px; cursor:pointer; }
+    .mini-day.today { background: var(--teal); color: white; font-weight: 700; }
+    .mini-day.has-booking { background: var(--mint); color: var(--teal); font-weight: 600; }
+    .mini-day.blocked { color: #e0e0e0; }
+    .btn-white { background: white; border: 1px solid #dde4e8; padding: 9px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .btn-teal { background: var(--teal); color: white; border: none; padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; }
+    .manage-link { color: var(--teal); text-decoration: none; font-size: 12px; }
+    .manage-link:hover { text-decoration: underline; }
+    .empty-row td { text-align: center; color: var(--muted); padding: 32px; }
+</style>
+
+<div class="admin-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <div class="admin-sidebar">
+        <div class="admin-logo">Denta<span style="color:#2aa896;">Care</span></div>
+        <div class="admin-role">Admin Panel · Klinik @Model.ClinicId</div>
+        <nav class="admin-nav">
+            <a asp-page="/Admin/Dashboard" class="active"><span class="nav-icon">📊</span> Dashboard</a>
+            <a asp-page="/Admin/Bookings"><span class="nav-icon">📅</span> Bookings</a>
+            <a asp-page="/Admin/Treatments"><span class="nav-icon">🦷</span> Treatments</a>
+            <a asp-page="/Admin/BlockedSlots"><span class="nav-icon">🚫</span> Block Times</a>
+            <a asp-page="/Admin/Patients"><span class="nav-icon">👥</span> Patients</a>
+        </nav>
+        <div class="sidebar-footer">
+            <form asp-page="/Account/Logout" method="post">
+                <button type="submit" style="background:none;border:none;cursor:pointer;padding:0;width:100%;text-align:left;">
+                    <span style="color:rgba(255,255,255,0.4);font-size:12px;">🚪 Log out</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── MAIN ── -->
+    <div class="admin-main">
+        <div class="admin-topbar">
+            <h2>@greeting 👋</h2>
+            <div style="display:flex;gap:12px;">
+                <a asp-page="/Admin/BlockedSlots" class="btn-white">🚫 Block Time</a>
+                <a asp-page="/Book" class="btn-teal">+ Add Booking</a>
+            </div>
+        </div>
+
+        <!-- ── STATS ── -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Today's Bookings</div>
+                <div class="stat-val">@Model.TodayCount</div>
+                <div class="stat-change">Confirmed + Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">This Week</div>
+                <div class="stat-val">@Model.WeekCount</div>
+                <div class="stat-change">Total appointments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Cancellations</div>
+                <div class="stat-val" style="color:var(--red);">@Model.CancelCount</div>
+                <div class="stat-change down">This month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Revenue (Month)</div>
+                <div class="stat-val">@Model.MonthRevenue.ToString("N0") kr</div>
+                <div class="stat-change">Completed bookings</div>
+            </div>
+        </div>
+
+        <!-- ── GRID ── -->
+        <div class="admin-grid">
+
+            <!-- Today's appointments table -->
+            <div class="bookings-table-card">
+                <div class="card-header">
+                    <h3>Today's Appointments</h3>
+                    <a asp-page="/Admin/Bookings">View all →</a>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Patient</th>
+                            <th>Treatment</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.TodayBookings.Any())
+                        {
+                            @foreach (var b in Model.TodayBookings)
+                            {
+                                <tr>
+                                    <td><strong>@b.StartTime.ToString("HH:mm")</strong></td>
+                                    <td>@b.PatientName</td>
+                                    <td>@b.TreatmentName</td>
+                                    <td>@b.DurationMinutes min</td>
+                                    <td>
+                                        <span class="status-badge @b.Status.ToLower()">@b.Status</span>
+                                    </td>
+                                    <td>
+                                        <a asp-page="/Admin/Bookings" asp-route-id="@b.Id" class="manage-link">Manage</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr class="empty-row"><td colspan="6">No appointments today</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mini calendar + upcoming -->
+            <div>
+                <div class="mini-calendar-card">
+                    <div class="card-header">
+                        <h3>@DateTime.Now.ToString("MMMM yyyy")</h3>
+                        <a asp-page="/Admin/Bookings">Full calendar →</a>
+                    </div>
+                    <div class="mini-cal-body">
+                        <div class="mini-weekdays">
+                            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span>
+                            <span style="color:#e05a5a;">S</span><span style="color:#e05a5a;">S</span>
+                        </div>
+                        <div class="mini-grid">
+                            @{
+                                var today = DateTime.Today;
+                                var firstDay = new DateTime(today.Year, today.Month, 1);
+                                var startOffset = ((int)firstDay.DayOfWeek + 6) % 7; // Monday = 0
+                                var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
+                                var bookingDays = Model.UpcomingBookings
+                                    .Where(b => b.Date.Month == today.Month && b.Date.Year == today.Year)
+                                    .Select(b => b.Date.Day).ToHashSet();
+                            }
+                            @for (int i = 0; i < startOffset; i++)
+                            {
+                                <div class="mini-day"></div>
+                            }
+                            @for (int day = 1; day <= daysInMonth; day++)
+                            {
+                                var isToday = day == today.Day;
+                                var hasBooking = bookingDays.Contains(day);
+                                var css = isToday ? "today" : hasBooking ? "has-booking" : "";
+                                <div class="mini-day @css" onclick="goToBookings(@today.Year, @today.Month, @day)">@day</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Upcoming next 2 -->
+                    @if (Model.UpcomingBookings.Any())
+                    {
+                        <div class="upcoming-list">
+                            <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;margin-bottom:4px;">NEXT UP</div>
+                            @foreach (var b in Model.UpcomingBookings.Take(2))
+                            {
+                                <div class="upcoming-item">
+                                    <div class="upcoming-time">
+                                        @b.StartTime.ToString("HH:mm")<br>
+                                        @b.Date.ToString("ddd").ToUpper()
+                                    </div>
+                                    <div class="upcoming-info">
+                                        <span>@b.PatientName</span>
+                                        <small>@b.TreatmentName · @b.DurationMinutes min</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+</div>
+
+@section Scripts {
+<script>
+    function goToBookings(year, month, day) {
+        const pad = n => String(n).padStart(2, '0');
+        const date = `${year}-${pad(month)}-${pad(day)}`;
+        window.location.href = `/Admin/Bookings?date=${date}`;
+    }
+</script>
+}

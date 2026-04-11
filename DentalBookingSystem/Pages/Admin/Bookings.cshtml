@@ -1,0 +1,763 @@
+@page
+@model DentalBookingSystem.Pages.Admin.BookingsModel
+@{
+    ViewData["Title"] = "Bookings";
+    Layout = "_Layout";
+}
+
+<style>
+    body {
+        background: var(--cream);
+    }
+
+    .admin-layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        min-height: 100vh;
+    }
+
+    .admin-sidebar {
+        background: var(--dark);
+        padding: 28px 0;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+
+    .admin-logo {
+        font-size: 22px;
+        font-weight: 700;
+        color: white;
+        padding: 0 24px 4px;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .admin-role {
+        font-size: 11px;
+        color: rgba(255,255,255,0.35);
+        padding: 0 24px 28px;
+        letter-spacing: .5px;
+    }
+
+    .admin-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 0 12px;
+    }
+
+        .admin-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.55);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all .15s;
+        }
+
+            .admin-nav a:hover {
+                background: rgba(255,255,255,0.07);
+                color: white;
+            }
+
+            .admin-nav a.active {
+                background: rgba(42,168,150,0.2);
+                color: #2aa896;
+            }
+
+    .nav-icon {
+        font-size: 15px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .sidebar-footer {
+        padding: 24px;
+        border-top: 1px solid rgba(255,255,255,0.07);
+        margin-top: 16px;
+    }
+
+    .admin-main {
+        padding: 36px 40px;
+    }
+
+    .admin-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+        .admin-topbar h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            color: var(--dark);
+        }
+
+    .filters-bar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        align-items: center;
+    }
+
+    .filter-select {
+        padding: 9px 14px;
+        border: 1.5px solid #dde4e8;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--dark);
+        background: white;
+        cursor: pointer;
+    }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #2aa896;
+        }
+
+    .search-input {
+        padding: 9px 14px;
+        border: 1.5px solid #dde4e8;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--dark);
+        background: white;
+        width: 220px;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2aa896;
+        }
+
+    .filter-count {
+        font-size: 13px;
+        color: var(--muted);
+        margin-left: auto;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e8edf0;
+        overflow: hidden;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        border-bottom: 1px solid #e8edf0;
+    }
+
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead th {
+        padding: 12px 20px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        background: #f8fafb;
+        text-align: left;
+        border-bottom: 1px solid #e8edf0;
+        white-space: nowrap;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #f0f4f7;
+        transition: background .1s;
+    }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #fafcfd;
+        }
+
+    tbody td {
+        padding: 14px 20px;
+        font-size: 13px;
+        color: var(--dark);
+        vertical-align: middle;
+    }
+
+    .patient-name {
+        font-weight: 600;
+    }
+
+    .treatment-name {
+        font-weight: 500;
+    }
+
+    .price-text {
+        font-weight: 700;
+        color: #1a7a6e;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .3px;
+    }
+
+    .status-confirmed {
+        background: #e8f8f2;
+        color: #1a7a6e;
+    }
+
+    .status-pending {
+        background: #fff4e0;
+        color: #b07d2a;
+    }
+
+    .status-cancelled {
+        background: #fde8e8;
+        color: #c0392b;
+    }
+
+    .status-completed {
+        background: #e8edf0;
+        color: #2c4a52;
+    }
+
+    .btn-manage {
+        background: #e8f5f0;
+        color: #1a7a6e;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        white-space: nowrap;
+    }
+
+        .btn-manage:hover {
+            background: #d0ede8;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .empty-icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15,32,39,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+    .modal {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        width: 460px;
+        max-width: 95vw;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+        .modal h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+            font-family: 'Playfair Display', serif;
+        }
+
+    .modal-subtitle {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 24px;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .detail-item {
+        background: #f8fafb;
+        border-radius: 10px;
+        padding: 12px 14px;
+    }
+
+    .detail-label {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 600;
+        letter-spacing: .5px;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+    }
+
+    .detail-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .status-section {
+        margin-bottom: 20px;
+    }
+
+        .status-section label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: .5px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+    .status-options {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .status-option {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1.5px solid #dde4e8;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        background: white;
+        font-family: 'DM Sans', sans-serif;
+        transition: all .15s;
+    }
+
+        .status-option.sel-confirmed {
+            border-color: #1a7a6e;
+            background: #e8f8f2;
+            color: #1a7a6e;
+        }
+
+        .status-option.sel-pending {
+            border-color: #c9a96e;
+            background: #fff4e0;
+            color: #b07d2a;
+        }
+
+        .status-option.sel-cancelled {
+            border-color: #e05a5a;
+            background: #fde8e8;
+            color: #c0392b;
+        }
+
+        .status-option.sel-completed {
+            border-color: #2c4a52;
+            background: #e8edf0;
+            color: #2c4a52;
+        }
+
+    .modal-footer {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .btn-primary {
+        background: var(--teal);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0f2027;
+        }
+
+        .btn-primary:disabled {
+            background: #c0c8d0;
+            cursor: not-allowed;
+        }
+
+    .btn-secondary {
+        background: white;
+        color: var(--dark);
+        border: 1px solid #dde4e8;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .alert {
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background: #e8f8f2;
+        border: 1px solid #a0dfc5;
+        color: #1a7a6e;
+    }
+
+    .alert-error {
+        background: #fde8e8;
+        border: 1px solid #f5b8b8;
+        color: #c0392b;
+    }
+
+    @@media (max-width: 768px) {
+        .admin-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-sidebar {
+            display: none;
+        }
+    }
+</style>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <div class="admin-sidebar">
+        <div class="admin-logo">Denta<span style="color:#2aa896;">Care</span></div>
+        <div class="admin-role">Admin Panel · Klinik @Model.ClinicId</div>
+        <nav class="admin-nav">
+            <a href="/Admin/Dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/Admin/Bookings" class="active"><span class="nav-icon">📅</span> Bookings</a>
+            <a href="/Admin/Treatments"><span class="nav-icon">🦷</span> Treatments</a>
+            <a href="/Admin/BlockedSlots"><span class="nav-icon">🚫</span> Block Times</a>
+            <a href="/Admin/Patients"><span class="nav-icon">👥</span> Patients</a>
+        </nav>
+        <div class="sidebar-footer">
+            <form asp-page="/Account/Logout" method="post">
+                <button type="submit" style="background:none;border:none;cursor:pointer;padding:0;width:100%;text-align:left;">
+                    <span style="color:rgba(255,255,255,0.4);font-size:12px;">🚪 Log out</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+        <div class="admin-topbar">
+            <h2>📅 Bookings</h2>
+        </div>
+
+        <div id="alert-area"></div>
+
+        <div class="filters-bar">
+            <input class="search-input" type="text" id="search" placeholder="🔍 Search patient or treatment…" oninput="applyFilters()" />
+            <select class="filter-select" id="filter-status" onchange="applyFilters()">
+                <option value="">All Statuses</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+            <select class="filter-select" id="filter-period" onchange="applyFilters()">
+                <option value="">All Time</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="upcoming">Upcoming</option>
+            </select>
+            <span class="filter-count" id="filter-count"></span>
+        </div>
+
+        <div class="table-card">
+            <div id="table-area">
+                <div class="empty-state"><div class="empty-icon">⏳</div>Loading bookings…</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MANAGE MODAL -->
+<div class="modal-overlay" id="manage-modal">
+    <div class="modal">
+        <h3 id="m-patient"></h3>
+        <div class="modal-subtitle" id="m-subtitle"></div>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Treatment</div>
+                <div class="detail-value" id="m-treatment"></div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Price</div>
+                <div class="detail-value" id="m-price"></div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Date</div>
+                <div class="detail-value" id="m-date"></div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Time</div>
+                <div class="detail-value" id="m-time"></div>
+            </div>
+        </div>
+        <div class="status-section">
+            <label>Update Status</label>
+            <div class="status-options">
+                <button class="status-option" data-status="Confirmed" onclick="selectStatus('Confirmed')">✅ Confirmed</button>
+                <button class="status-option" data-status="Pending" onclick="selectStatus('Pending')">⏳ Pending</button>
+                <button class="status-option" data-status="Completed" onclick="selectStatus('Completed')">🏁 Completed</button>
+                <button class="status-option" data-status="Cancelled" onclick="selectStatus('Cancelled')">❌ Cancelled</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal()">Close</button>
+            <button class="btn-primary" id="save-status-btn" onclick="saveStatus()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const CLINIC_ID = @Model.ClinicId;
+        const API = 'http://localhost:5296';
+        let allBookings = [];
+        let filtered = [];
+        let managingId = null;
+        let selectedStatus = null;
+
+        async function loadBookings() {
+            try {
+                const res = await fetch(`${API}/api/bookings?clinicId=${CLINIC_ID}`);
+                if (!res.ok) throw new Error();
+                allBookings = await res.json();
+                const urlParams = new URLSearchParams(window.location.search);
+                const dateParam = urlParams.get('date');
+                if (dateParam) {
+                    document.getElementById('search').value = dateParam;
+                }
+                applyFilters();
+            } catch {
+                document.getElementById('table-area').innerHTML =
+                    '<div class="empty-state"><div class="empty-icon">❌</div>Could not load bookings.</div>';
+            }
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const status = document.getElementById('filter-status').value;
+            const period = document.getElementById('filter-period').value;
+            const today = new Date(); today.setHours(0,0,0,0);
+
+            filtered = allBookings.filter(b => {
+                if (search && !b.patientName?.toLowerCase().includes(search) &&
+                             !b.treatmentName?.toLowerCase().includes(search) &&
+                             !b.date?.includes(search)) return false;
+                if (status && b.status !== status) return false;
+                if (period) {
+                    const bDate = new Date(b.date + 'T00:00:00');
+                    if (period === 'today') {
+                        if (bDate.toDateString() !== today.toDateString()) return false;
+                    } else if (period === 'week') {
+                        const weekEnd = new Date(today); weekEnd.setDate(today.getDate() + 7);
+                        if (bDate < today || bDate > weekEnd) return false;
+                    } else if (period === 'month') {
+                        if (bDate.getMonth() !== today.getMonth() || bDate.getFullYear() !== today.getFullYear()) return false;
+                    } else if (period === 'upcoming') {
+                        if (bDate < today || b.status === 'Cancelled') return false;
+                    }
+                }
+                return true;
+            });
+
+            document.getElementById('filter-count').textContent =
+                `${filtered.length} of ${allBookings.length} booking${allBookings.length !== 1 ? 's' : ''}`;
+            renderTable();
+        }
+
+        function renderTable() {
+            if (!filtered.length) {
+                document.getElementById('table-area').innerHTML =
+                    '<div class="empty-state"><div class="empty-icon">📭</div>No bookings match your filters.</div>';
+                return;
+            }
+
+            const sorted = [...filtered].sort((a, b) => {
+                const da = new Date(a.date + 'T' + a.startTime);
+                const db = new Date(b.date + 'T' + b.startTime);
+                return db - da;
+            });
+
+            document.getElementById('table-area').innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Treatment</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sorted.map(b => `
+                        <tr>
+                            <td><div class="patient-name">${esc(b.patientName ?? '—')}</div></td>
+                            <td><span class="treatment-name">${esc(b.treatmentName ?? '—')}</span></td>
+                            <td>${formatDate(b.date)}</td>
+                            <td>${b.startTime?.substring(0,5) ?? '—'} – ${b.endTime?.substring(0,5) ?? '—'}</td>
+                            <td><span class="price-text">${(b.price ?? 0).toLocaleString('sv-SE')} kr</span></td>
+                            <td><span class="status-badge status-${(b.status ?? '').toLowerCase()}">${b.status ?? '—'}</span></td>
+                            <td><button class="btn-manage" onclick="openManage(${b.id})">Manage</button></td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>`;
+        }
+
+        function openManage(id) {
+            const b = allBookings.find(x => x.id === id);
+            if (!b) return;
+            managingId = id;
+            selectedStatus = b.status;
+
+            document.getElementById('m-patient').textContent = b.patientName ?? 'Patient';
+            document.getElementById('m-subtitle').textContent = `Booking #${b.id}`;
+            document.getElementById('m-treatment').textContent = b.treatmentName ?? '—';
+            document.getElementById('m-price').textContent = `${(b.price ?? 0).toLocaleString('sv-SE')} kr`;
+            document.getElementById('m-date').textContent = formatDate(b.date);
+            document.getElementById('m-time').textContent =
+                `${b.startTime?.substring(0,5) ?? '—'} – ${b.endTime?.substring(0,5) ?? '—'}`;
+
+            highlightStatus(b.status);
+            document.getElementById('manage-modal').classList.add('open');
+        }
+
+        function selectStatus(status) {
+            selectedStatus = status;
+            highlightStatus(status);
+        }
+
+        function highlightStatus(status) {
+            document.querySelectorAll('.status-option').forEach(btn => {
+                btn.className = 'status-option';
+                if (btn.dataset.status === status)
+                    btn.classList.add(`sel-${status.toLowerCase()}`);
+            });
+        }
+
+        async function saveStatus() {
+            if (!managingId || !selectedStatus) return;
+            const btn = document.getElementById('save-status-btn');
+            btn.disabled = true; btn.textContent = 'Saving…';
+
+            try {
+                const res = await fetch(`${API}/api/bookings/${managingId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: selectedStatus })
+                });
+                if (res.ok) {
+                    closeModal();
+                    showAlert('success', '✅ Booking status updated.');
+                    await loadBookings();
+                } else {
+                    showAlert('error', '❌ Could not update booking.');
+                }
+            } catch {
+                showAlert('error', '❌ Network error.');
+            }
+            btn.disabled = false; btn.textContent = 'Save Changes';
+        }
+
+        function closeModal() { document.getElementById('manage-modal').classList.remove('open'); }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function showAlert(type, msg) {
+            const area = document.getElementById('alert-area');
+            area.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+            if (type === 'success') setTimeout(() => area.innerHTML = '', 5000);
+        }
+
+        function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+        document.getElementById('manage-modal').addEventListener('click', e => {
+            if (e.target === document.getElementById('manage-modal')) closeModal();
+        });
+
+        loadBookings();
+
+                // ── SIGNALR ───────────────────────────────────────────
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl('http://localhost:5296/hubs/booking')
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on('SlotTaken', () => loadBookings());
+        connection.on('SlotFreed', () => loadBookings());
+
+        async function startSignalR() {
+            try {
+                await connection.start();
+                await connection.invoke('JoinClinicGroup', CLINIC_ID);
+            } catch (err) {
+                console.warn('SignalR connection failed:', err);
+            }
+        }
+
+        startSignalR();
+    </script>
+}
