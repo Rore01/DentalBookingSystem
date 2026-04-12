@@ -1,0 +1,328 @@
+@page
+@model DentalBookingSystem.Pages.Admin.BlockedSlotsModel
+@{
+    ViewData["Title"] = "Block Times";
+    Layout = "_Layout";
+}
+
+<style>
+    body { background: var(--cream); }
+
+    .admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+    .admin-sidebar { background: var(--dark); padding: 28px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .admin-logo { font-size: 22px; font-weight: 700; color: white; padding: 0 24px 4px; font-family: 'Playfair Display', serif; }
+    .admin-role { font-size: 11px; color: rgba(255,255,255,0.35); padding: 0 24px 28px; letter-spacing: .5px; }
+    .admin-nav { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; }
+    .admin-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 500; text-decoration: none; transition: all .15s; }
+    .admin-nav a:hover { background: rgba(255,255,255,0.07); color: white; }
+    .admin-nav a.active { background: rgba(42,168,150,0.2); color: #2aa896; }
+    .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 24px; border-top: 1px solid rgba(255,255,255,0.07); margin-top: 16px; }
+    .sidebar-footer a { color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none; }
+
+    .admin-main { padding: 36px 40px; }
+    .admin-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .admin-topbar h2 { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--dark); }
+    .page-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+
+    .page-grid { display: grid; grid-template-columns: 360px 1fr; gap: 24px; align-items: start; }
+
+    /* Add form card */
+    .form-card { background: white; border-radius: 16px; border: 1px solid #e8edf0; padding: 28px; }
+    .form-card h3 { font-size: 15px; font-weight: 600; color: var(--dark); margin-bottom: 20px; font-family: 'DM Sans', sans-serif; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .5px; margin-bottom: 6px; text-transform: uppercase; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1.5px solid #dde4e8; border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--dark); background: white; box-sizing: border-box; transition: border-color .15s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #2aa896; }
+    .form-group textarea { resize: vertical; min-height: 64px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .hint-text { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .all-day-toggle { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; cursor: pointer; }
+    .all-day-toggle input[type=checkbox] { width: 16px; height: 16px; accent-color: #1a7a6e; cursor: pointer; }
+    .all-day-toggle span { font-size: 13px; font-weight: 500; color: var(--dark); }
+
+    .btn-primary { width: 100%; background: var(--teal); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .15s; }
+    .btn-primary:hover:not(:disabled) { background: #0f2027; }
+    .btn-primary:disabled { background: #c0c8d0; cursor: not-allowed; }
+    .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @@keyframes spin { to { transform: rotate(360deg); } }
+    .form-error { background: #fde8e8; border: 1px solid #f5b8b8; color: #c0392b; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px; display: none; }
+
+    /* Blocked list */
+    .list-card { background: white; border-radius: 16px; border: 1px solid #e8edf0; overflow: hidden; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid #e8edf0; }
+    .card-header h3 { font-size: 15px; font-weight: 600; color: var(--dark); font-family: 'DM Sans', sans-serif; }
+    .card-header span { font-size: 12px; color: var(--muted); }
+
+    .blocked-item { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 16px 24px; border-bottom: 1px solid #f0f4f7; transition: background .1s; }
+    .blocked-item:last-child { border-bottom: none; }
+    .blocked-item:hover { background: #fafcfd; }
+    .blocked-info .b-date { font-size: 14px; font-weight: 600; color: var(--dark); }
+    .blocked-info .b-time { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .blocked-info .b-reason { font-size: 12px; color: #8a6030; background: #fff8f0; border: 1px solid #f5d9b0; border-radius: 6px; padding: 2px 8px; display: inline-block; margin-top: 4px; }
+    .all-day-badge { background: #fde8e8; color: #c0392b; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; display: inline-block; margin-left: 8px; }
+    .btn-delete { background: #fde8e8; color: #c0392b; border: none; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+    .btn-delete:hover { background: #f5c0c0; }
+
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); font-size: 13px; }
+    .empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+    .alert { padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 20px; }
+    .alert-success { background: #e8f8f2; border: 1px solid #a0dfc5; color: #1a7a6e; }
+    .alert-error { background: #fde8e8; border: 1px solid #f5b8b8; color: #c0392b; }
+
+    @@media (max-width: 900px) { .page-grid { grid-template-columns: 1fr; } }
+    @@media (max-width: 768px) { .admin-layout { grid-template-columns: 1fr; } .admin-sidebar { display: none; } }
+</style>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <div class="admin-sidebar">
+        <div class="admin-logo">Denta<span style="color:#2aa896;">Care</span></div>
+        <div class="admin-role">Admin Panel · Klinik @Model.ClinicId</div>
+        <nav class="admin-nav">
+            <a href="/Admin/Dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/Admin/Bookings"><span class="nav-icon">📅</span> Bookings</a>
+            <a href="/Admin/Treatments"><span class="nav-icon">🦷</span> Treatments</a>
+            <a href="/Admin/BlockedSlots" class="active"><span class="nav-icon">🚫</span> Block Times</a>
+            <a href="/Admin/Patients"><span class="nav-icon">👥</span> Patients</a>
+        </nav>
+        <div class="sidebar-footer">
+            <form asp-page="/Account/Logout" method="post">
+                <button type="submit" style="background:none;border:none;cursor:pointer;padding:0;width:100%;text-align:left;">
+                    <span style="color:rgba(255,255,255,0.4);font-size:12px;">🚪 Log out</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+        <div class="admin-topbar">
+            <h2>🚫 Block Times</h2>
+        </div>
+        <p class="page-subtitle">Block specific dates or time slots to prevent patients from booking during holidays, staff absences, or maintenance.</p>
+
+        <div id="alert-area"></div>
+
+        <div class="page-grid">
+
+            <!-- ADD FORM -->
+            <div class="form-card">
+                <h3>Block a Date or Time</h3>
+                <div class="form-error" id="form-error"></div>
+
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="f-date" />
+                </div>
+
+                <label class="all-day-toggle">
+                    <input type="checkbox" id="f-allday" checked onchange="toggleAllDay()" />
+                    <span>Block entire day</span>
+                </label>
+
+                <div id="time-fields" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Start Time</label>
+                            <input type="time" id="f-start" value="08:00" />
+                        </div>
+                        <div class="form-group">
+                            <label>End Time</label>
+                            <input type="time" id="f-end" value="12:00" />
+                        </div>
+                    </div>
+                    <p class="hint-text">Leave as all-day to block the entire date.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Reason <span style="font-weight:400;text-transform:none;">(optional)</span></label>
+                    <textarea id="f-reason" placeholder="e.g. Public holiday, Staff training, Vacation…"></textarea>
+                </div>
+
+                <button class="btn-primary" id="add-btn" onclick="addBlock()">🚫 Block This Time</button>
+            </div>
+
+            <!-- BLOCKED LIST -->
+            <div class="list-card">
+                <div class="card-header">
+                    <h3>Blocked Slots</h3>
+                    <span id="block-count">Loading…</span>
+                </div>
+                <div id="blocks-area">
+                    <div class="empty-state"><div class="empty-icon">⏳</div>Loading…</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const CLINIC_ID = @Model.ClinicId;
+    const API = 'http://localhost:5296';
+    let blocks = [];
+
+    // Set default date to today
+    document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+
+    // ── LOAD ──────────────────────────────────────────────────
+    async function loadBlocks() {
+        try {
+            const res = await fetch(`${API}/api/blocked-slots?clinicId=${CLINIC_ID}`);
+            const data = await res.json();
+            blocks = (Array.isArray(data) ? data : data.blockedSlots ?? []).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            renderBlocks();
+        } catch {
+            document.getElementById('blocks-area').innerHTML =
+                '<div class="empty-state"><div class="empty-icon">❌</div>Could not load blocked slots.</div>';
+        }
+    }
+
+    function renderBlocks() {
+        document.getElementById('block-count').textContent =
+            `${blocks.length} block${blocks.length !== 1 ? 's' : ''}`;
+
+        if (!blocks.length) {
+            document.getElementById('blocks-area').innerHTML =
+                '<div class="empty-state"><div class="empty-icon">✅</div>No blocked slots — all dates are open.</div>';
+            return;
+        }
+
+        // Group by upcoming vs past
+        const today = new Date(); today.setHours(0,0,0,0);
+        const upcoming = blocks.filter(b => new Date(b.startDate) >= today);
+        const past = blocks.filter(b => new Date(b.startDate) < today);
+
+        let html = '';
+        if (upcoming.length) {
+            html += renderGroup('Upcoming', upcoming);
+        }
+        if (past.length) {
+            html += renderGroup('Past', past);
+        }
+        document.getElementById('blocks-area').innerHTML = html;
+    }
+
+    function renderGroup(label, items) {
+        return `
+            <div style="padding:12px 24px 4px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;background:#f8fafb;border-bottom:1px solid #f0f4f7;">${label.toUpperCase()}</div>
+            ${items.map(b => {
+                const isAllDay = !b.startTime && !b.endTime;
+                const timeStr = isAllDay ? '' : `${b.startTime?.substring(0,5)} – ${b.endTime?.substring(0,5)}`;
+                return `
+                <div class="blocked-item">
+                    <div class="blocked-info">
+                        <div class="b-date">
+                            ${formatDate(b.startDate)}
+                            ${isAllDay ? '<span class="all-day-badge">All day</span>' : ''}
+                        </div>
+                        ${timeStr ? `<div class="b-time">⏰ ${timeStr}</div>` : ''}
+                        ${b.reason ? `<div class="b-reason">📝 ${esc(b.reason)}</div>` : ''}
+                    </div>
+                    <button class="btn-delete" onclick="deleteBlock(${b.id})">Remove</button>
+                </div>`;
+            }).join('')}`;
+    }
+
+    // ── TOGGLE ALL DAY ────────────────────────────────────────
+    function toggleAllDay() {
+        const allDay = document.getElementById('f-allday').checked;
+        document.getElementById('time-fields').style.display = allDay ? 'none' : 'block';
+    }
+
+    // ── ADD ───────────────────────────────────────────────────
+    async function addBlock() {
+        const date = document.getElementById('f-date').value;
+        const allDay = document.getElementById('f-allday').checked;
+        const startTime = document.getElementById('f-start').value;
+        const endTime = document.getElementById('f-end').value;
+        const reason = document.getElementById('f-reason').value.trim();
+
+        if (!date) { showFormError('Please select a date.'); return; }
+        if (!allDay && (!startTime || !endTime)) { showFormError('Please enter start and end times.'); return; }
+        if (!allDay && startTime >= endTime) { showFormError('End time must be after start time.'); return; }
+
+        const btn = document.getElementById('add-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Blocking…';
+
+        const body = {
+            clinicId: CLINIC_ID,
+            date,
+            startTime: allDay ? null : startTime + ':00',
+            endTime: allDay ? null : endTime + ':00',
+            reason: reason || null
+        };
+
+        try {
+            const res = await fetch(`${API}/api/blocked-slots`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (res.ok) {
+                document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('f-reason').value = '';
+                document.getElementById('f-allday').checked = true;
+                document.getElementById('time-fields').style.display = 'none';
+                document.getElementById('form-error').style.display = 'none';
+                showAlert('success', '✅ Time slot blocked successfully.');
+                await loadBlocks();
+            } else {
+                const txt = await res.text();
+                showFormError(res.status === 409 ? '⚠️ This date cannot be blocked. Either it has active bookings or is already blocked.' : txt || 'Could not block this slot.');
+            }
+        } catch {
+            showFormError('Network error. Please try again.');
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '🚫 Block This Time';
+    }
+
+    // ── DELETE ────────────────────────────────────────────────
+    async function deleteBlock(id) {
+        if (!confirm('Remove this blocked slot?')) return;
+        try {
+            const res = await fetch(`${API}/api/blocked-slots/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                showAlert('success', '✅ Blocked slot removed.');
+                await loadBlocks();
+            } else {
+                showAlert('error', '❌ Could not remove blocked slot.');
+            }
+        } catch {
+            showAlert('error', '❌ Network error.');
+        }
+    }
+
+    // ── HELPERS ───────────────────────────────────────────────
+    function formatDate(dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    function showFormError(msg) {
+        const el = document.getElementById('form-error');
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    function showAlert(type, msg) {
+        const area = document.getElementById('alert-area');
+        area.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (type === 'success') setTimeout(() => area.innerHTML = '', 5000);
+    }
+
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    loadBlocks();
+</script>
+}

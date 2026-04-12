@@ -1,0 +1,302 @@
+@page
+@model DentalBookingSystem.Pages.Admin.PatientsModel
+@{
+    ViewData["Title"] = "Patients";
+    Layout = "_Layout";
+}
+
+<style>
+    body { background: var(--cream); }
+
+    .admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+    .admin-sidebar { background: var(--dark); padding: 28px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .admin-logo { font-size: 22px; font-weight: 700; color: white; padding: 0 24px 4px; font-family: 'Playfair Display', serif; }
+    .admin-role { font-size: 11px; color: rgba(255,255,255,0.35); padding: 0 24px 28px; letter-spacing: .5px; }
+    .admin-nav { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; }
+    .admin-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 500; text-decoration: none; transition: all .15s; }
+    .admin-nav a:hover { background: rgba(255,255,255,0.07); color: white; }
+    .admin-nav a.active { background: rgba(42,168,150,0.2); color: #2aa896; }
+    .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 24px; border-top: 1px solid rgba(255,255,255,0.07); margin-top: 16px; }
+    .sidebar-footer a { color: rgba(255,255,255,0.4); font-size: 12px; text-decoration: none; }
+
+    .admin-main { padding: 36px 40px; }
+    .admin-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+    .admin-topbar h2 { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--dark); }
+
+    .filters-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+    .search-input { padding: 9px 14px; border: 1.5px solid #dde4e8; border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--dark); background: white; width: 260px; }
+    .search-input:focus { outline: none; border-color: #2aa896; }
+    .filter-count { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+    .table-card { background: white; border-radius: 16px; border: 1px solid #e8edf0; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; background: #f8fafb; text-align: left; border-bottom: 1px solid #e8edf0; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid #f0f4f7; transition: background .1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fafcfd; }
+    tbody td { padding: 14px 20px; font-size: 13px; color: var(--dark); vertical-align: middle; }
+
+    .patient-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #1a7a6e, #2aa896); color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .patient-cell { display: flex; align-items: center; gap: 12px; }
+    .patient-name { font-weight: 600; }
+    .patient-id { font-size: 11px; color: var(--muted); }
+    .booking-count { background: #e8f5f0; color: #1a7a6e; font-weight: 700; padding: 4px 10px; border-radius: 20px; font-size: 12px; display: inline-block; }
+    .booking-count.zero { background: #f0f4f7; color: var(--muted); }
+    .btn-view { background: #e8f5f0; color: #1a7a6e; border: none; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .btn-view:hover { background: #d0ede8; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,32,39,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: 16px; padding: 32px; width: 540px; max-width: 95vw; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+
+    .patient-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+    .patient-header-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #1a7a6e, #2aa896); color: white; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .patient-header-info h3 { font-size: 18px; font-weight: 700; color: var(--dark); font-family: 'Playfair Display', serif; margin-bottom: 4px; }
+    .patient-header-info span { font-size: 13px; color: var(--muted); }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .info-item { background: #f8fafb; border-radius: 10px; padding: 12px 14px; }
+    .info-label { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: .5px; margin-bottom: 4px; text-transform: uppercase; }
+    .info-value { font-size: 14px; font-weight: 600; color: var(--dark); word-break: break-all; }
+
+    .bookings-section h4 { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 12px; }
+    .booking-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 8px; border: 1px solid #e8edf0; margin-bottom: 8px; }
+    .bi-treatment { font-weight: 600; font-size: 13px; }
+    .bi-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .status-badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .status-confirmed { background: #e8f8f2; color: #1a7a6e; }
+    .status-pending { background: #fff4e0; color: #b07d2a; }
+    .status-cancelled { background: #fde8e8; color: #c0392b; }
+    .status-completed { background: #e8edf0; color: #2c4a52; }
+
+    .modal-footer { display: flex; justify-content: flex-end; margin-top: 20px; }
+    .btn-secondary { background: white; color: var(--dark); border: 1px solid #dde4e8; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+    @@media (max-width: 768px) { .admin-layout { grid-template-columns: 1fr; } .admin-sidebar { display: none; } }
+</style>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <div class="admin-sidebar">
+        <div class="admin-logo">Denta<span style="color:#2aa896;">Care</span></div>
+        <div class="admin-role">Admin Panel · Klinik @Model.ClinicId</div>
+        <nav class="admin-nav">
+            <a href="/Admin/Dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/Admin/Bookings"><span class="nav-icon">📅</span> Bookings</a>
+            <a href="/Admin/Treatments"><span class="nav-icon">🦷</span> Treatments</a>
+            <a href="/Admin/BlockedSlots"><span class="nav-icon">🚫</span> Block Times</a>
+            <a href="/Admin/Patients" class="active"><span class="nav-icon">👥</span> Patients</a>
+        </nav>
+        <div class="sidebar-footer">
+            <form asp-page="/Account/Logout" method="post">
+                <button type="submit" style="background:none;border:none;cursor:pointer;padding:0;width:100%;text-align:left;">
+                    <span style="color:rgba(255,255,255,0.4);font-size:12px;">🚪 Log out</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+        <div class="admin-topbar">
+            <h2>👥 Patients</h2>
+        </div>
+
+        <div class="filters-bar">
+            <input class="search-input" type="text" id="search"
+                   placeholder="🔍 Search by name, email or phone…" oninput="applyFilter()" />
+            <span class="filter-count" id="filter-count"></span>
+        </div>
+
+        <div class="table-card">
+            <div id="table-area">
+                <div class="empty-state"><div class="empty-icon">⏳</div>Loading patients…</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PATIENT DETAIL MODAL -->
+<div class="modal-overlay" id="patient-modal">
+    <div class="modal">
+        <div class="patient-header">
+            <div class="patient-header-avatar" id="m-avatar"></div>
+            <div class="patient-header-info">
+                <h3 id="m-name"></h3>
+                <span id="m-id"></span>
+            </div>
+        </div>
+        <div class="info-grid">
+            <div class="info-item"><div class="info-label">Email</div><div class="info-value" id="m-email"></div></div>
+            <div class="info-item"><div class="info-label">Phone</div><div class="info-value" id="m-phone"></div></div>
+            <div class="info-item"><div class="info-label">Total Bookings</div><div class="info-value" id="m-total"></div></div>
+            <div class="info-item"><div class="info-label">Last Visit</div><div class="info-value" id="m-last"></div></div>
+        </div>
+        <div class="bookings-section">
+            <h4>Booking History</h4>
+            <div id="m-bookings"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const CLINIC_ID = @Model.ClinicId;
+    const API = 'http://localhost:5296';
+    let allPatients = [];
+    let allBookings = [];
+    let filtered = [];
+
+    async function loadData() {
+        try {
+            const res = await fetch(`${API}/api/bookings?clinicId=${CLINIC_ID}`);
+            allBookings = await res.json();
+
+            const patientMap = new Map();
+            allBookings.forEach(b => {
+                if (!b.patientId) return;
+                if (!patientMap.has(b.patientId)) {
+                    patientMap.set(b.patientId, {
+                        id: b.patientId,
+                        name: b.patientName ?? 'Unknown',
+                        email: b.patientEmail ?? '—',
+                        phone: b.patientPhone ?? '—',
+                        bookings: []
+                    });
+                }
+                patientMap.get(b.patientId).bookings.push(b);
+            });
+
+            allPatients = Array.from(patientMap.values())
+                .sort((a, b) => a.name.localeCompare(b.name));
+
+            applyFilter();
+        } catch {
+            document.getElementById('table-area').innerHTML =
+                '<div class="empty-state"><div class="empty-icon">❌</div>Could not load patients.</div>';
+        }
+    }
+
+    function applyFilter() {
+        const q = document.getElementById('search').value.toLowerCase();
+        filtered = allPatients.filter(p =>
+            !q || p.name.toLowerCase().includes(q) ||
+            p.email.toLowerCase().includes(q) ||
+            p.phone.toLowerCase().includes(q)
+        );
+        document.getElementById('filter-count').textContent =
+            `${filtered.length} of ${allPatients.length} patient${allPatients.length !== 1 ? 's' : ''}`;
+        renderTable();
+    }
+
+    function renderTable() {
+        if (!allPatients.length) {
+            document.getElementById('table-area').innerHTML =
+                '<div class="empty-state"><div class="empty-icon">👥</div>No patients yet. Patients appear here once they make a booking.</div>';
+            return;
+        }
+        if (!filtered.length) {
+            document.getElementById('table-area').innerHTML =
+                '<div class="empty-state"><div class="empty-icon">🔍</div>No patients match your search.</div>';
+            return;
+        }
+
+        document.getElementById('table-area').innerHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Bookings</th>
+                        <th>Last Visit</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${filtered.map(p => {
+                        const initials = p.name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+                        const lastVisit = p.bookings
+                            .filter(b => b.status === 'Completed')
+                            .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+                        const count = p.bookings.length;
+                        return `
+                        <tr>
+                            <td>
+                                <div class="patient-cell">
+                                    <div class="patient-avatar">${initials}</div>
+                                    <div>
+                                        <div class="patient-name">${esc(p.name)}</div>
+                                        <div class="patient-id">#${p.id}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${esc(p.email)}</td>
+                            <td>${esc(p.phone)}</td>
+                            <td><span class="booking-count ${count === 0 ? 'zero' : ''}">${count}</span></td>
+                            <td>${lastVisit ? formatDate(lastVisit.date) : '—'}</td>
+                            <td><button class="btn-view" onclick="openPatient(${p.id})">View</button></td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>`;
+    }
+
+    function openPatient(id) {
+        const p = allPatients.find(x => x.id === id);
+        if (!p) return;
+
+        const initials = p.name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+        document.getElementById('m-avatar').textContent = initials;
+        document.getElementById('m-name').textContent = p.name;
+        document.getElementById('m-id').textContent = `Patient #${p.id}`;
+        document.getElementById('m-email').textContent = p.email;
+        document.getElementById('m-phone').textContent = p.phone;
+        document.getElementById('m-total').textContent = `${p.bookings.length} booking${p.bookings.length !== 1 ? 's' : ''}`;
+
+        const lastVisit = p.bookings
+            .filter(b => b.status === 'Completed')
+            .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+        document.getElementById('m-last').textContent = lastVisit ? formatDate(lastVisit.date) : 'None yet';
+
+        const sorted = [...p.bookings].sort((a, b) => new Date(b.date) - new Date(a.date));
+        document.getElementById('m-bookings').innerHTML = sorted.length
+            ? sorted.map(b => `
+                <div class="booking-item">
+                    <div>
+                        <div class="bi-treatment">${esc(b.treatmentName ?? '—')}</div>
+                        <div class="bi-date">${formatDate(b.date)} · ${b.startTime?.substring(0,5) ?? '—'}</div>
+                    </div>
+                    <span class="status-badge status-${(b.status ?? '').toLowerCase()}">${b.status ?? '—'}</span>
+                </div>`).join('')
+            : '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px 0;">No bookings yet.</div>';
+
+        document.getElementById('patient-modal').classList.add('open');
+    }
+
+    function closeModal() { document.getElementById('patient-modal').classList.remove('open'); }
+
+    document.getElementById('patient-modal').addEventListener('click', e => {
+        if (e.target === document.getElementById('patient-modal')) closeModal();
+    });
+
+    function formatDate(d) {
+        if (!d) return '—';
+        return new Date(d + 'T00:00:00').toLocaleDateString('sv-SE', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    loadData();
+</script>
+}
