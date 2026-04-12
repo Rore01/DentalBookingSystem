@@ -1,0 +1,258 @@
+﻿@page
+@model DentalBookingSystem.Pages.AccountModel
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@{
+    ViewData["Title"] = "My Account";
+    Layout = "_Layout";
+    var userName = User.Identity?.Name ?? "Patient";
+    var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+}
+
+<style>
+    body { background: #f0f4f7; }
+    .dashboard-wrapper { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 64px); }
+
+    .section-card { background: white; border-radius: 16px; border: 1px solid #e8edf0; padding: 28px; margin-bottom: 20px; }
+    .section-card h3 { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--dark); margin-bottom: 6px; }
+    .section-card p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .5px; margin-bottom: 6px; text-transform: uppercase; }
+    .form-group input { width: 100%; padding: 10px 14px; border: 1.5px solid #dde4e8; border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--dark); background: white; box-sizing: border-box; transition: border-color .15s; }
+    .form-group input:focus { outline: none; border-color: #2aa896; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .btn-save { background: var(--teal); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .15s; }
+    .btn-save:hover:not(:disabled) { background: #0f2027; }
+    .btn-save:disabled { background: #c0c8d0; cursor: not-allowed; }
+    .btn-danger { background: #fde8e8; color: #c0392b; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .btn-danger:hover { background: #f5c0c0; }
+
+    .alert { padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; }
+    .alert-success { background: #e8f8f2; border: 1px solid #a0dfc5; color: #1a7a6e; }
+    .alert-error { background: #fde8e8; border: 1px solid #f5b8b8; color: #c0392b; }
+
+    .danger-zone { border: 1.5px solid #f5b8b8; }
+    .danger-zone h3 { color: #c0392b; }
+
+    .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<div class="dashboard-wrapper">
+<form id="logout-form" asp-page="/Account/Logout" method="post" style="display:none;"></form>
+
+    <!-- SIDEBAR -->
+    <div class="cust-sidebar">
+        <div class="cust-avatar">👤</div>
+        <div class="cust-name">@userName</div>
+        <div class="cust-email">@userEmail</div>
+        <nav class="cust-nav">
+            <a asp-page="/MyBookings"><span>📅</span> My Bookings</a>
+            <a asp-page="/Book"><span>➕</span> Book New</a>
+            <a asp-page="/Account" class="active"><span>⚙️</span> Account</a>
+            <form asp-page="/Account/Logout" method="post">
+                <button type="submit" style="background:none;border:none;width:100%;text-align:left;cursor:pointer;">
+                    <a style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:rgba(255,255,255,0.65);font-size:13px;font-weight:500;text-decoration:none;">
+                        <span>🚪</span> Log out
+                    </a>
+                </button>
+            </form>
+        </nav>
+    </div>
+
+    <!-- MAIN -->
+    <div class="cust-main">
+        <div class="cust-header">
+            <h2>My Account</h2>
+            <p>Manage your personal information and security settings</p>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="section-card">
+            <h3>Personal Information</h3>
+            <p>Update your name and phone number</p>
+            <div id="profile-alert"></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" id="firstName" value="@Model.FirstName" />
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="lastName" value="@Model.LastName" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="phone" value="@(Model.Phone ?? "")" placeholder="+46 70 000 00 00" />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" value="@userEmail" disabled style="background:#f4f7f8;color:#8a9aa5;cursor:not-allowed;" />
+            </div>
+            <button class="btn-save" id="save-profile-btn" onclick="saveProfile()">Save Changes</button>
+        </div>
+
+        <!-- CHANGE PASSWORD -->
+        <div class="section-card">
+            <h3>Change Password</h3>
+            <p>Make sure to use a strong password</p>
+            <div id="password-alert"></div>
+            <div class="form-group">
+    <label>Current Password</label>
+    <div style="position:relative;">
+        <input type="password" id="currentPassword" placeholder="Enter current password" style="padding-right:40px;" />
+        <button type="button" onclick="togglePwd('currentPassword', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);">👁️</button>
+    </div>
+    </div>
+        <div class="form-group">
+            <label>New Password</label>
+            <div style="position:relative;">
+                <input type="password" id="newPassword" placeholder="At least 6 characters" style="padding-right:40px;" />
+                <button type="button" onclick="togglePwd('newPassword', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);">👁️</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Confirm New Password</label>
+            <div style="position:relative;">
+                <input type="password" id="confirmPassword" placeholder="Repeat new password" style="padding-right:40px;" />
+                <button type="button" onclick="togglePwd('confirmPassword', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);">👁️</button>
+            </div>
+        </div>
+            <button class="btn-save" id="save-password-btn" onclick="changePassword()">Update Password</button>
+        </div>
+
+        <!-- DELETE ACCOUNT -->
+        <div class="section-card danger-zone">
+            <h3>Delete Account</h3>
+            <p>Permanently delete your account and all your data. This cannot be undone. All upcoming bookings will be cancelled.</p>
+            <div id="delete-alert"></div>
+            <button class="btn-danger" onclick="confirmDelete()">Delete My Account</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const PATIENT_ID = @Model.PatientId;
+    const API = 'http://localhost:5296';
+
+    // ── SAVE PROFILE ──────────────────────────────────────
+    async function saveProfile() {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName  = document.getElementById('lastName').value.trim();
+        const phone     = document.getElementById('phone').value.trim();
+
+        if (!firstName || !lastName) {
+            showAlert('profile-alert', 'error', 'First and last name are required.');
+            return;
+        }
+
+        const btn = document.getElementById('save-profile-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Saving…';
+
+        try {
+            const res = await fetch(`${API}/api/patients/${PATIENT_ID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ firstName, lastName, phone: phone || null })
+            });
+
+            if (res.ok) {
+                showAlert('profile-alert', 'success', '✅ Profile updated successfully.');
+            } else {
+                const txt = await res.text();
+                showAlert('profile-alert', 'error', `❌ ${txt || 'Could not update profile.'}`);
+            }
+        } catch {
+            showAlert('profile-alert', 'error', '❌ Network error. Please try again.');
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = 'Save Changes';
+    }
+
+    // ── CHANGE PASSWORD ───────────────────────────────────
+    async function changePassword() {
+        const current = document.getElementById('currentPassword').value;
+        const newPwd  = document.getElementById('newPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+
+        if (!current || !newPwd || !confirm) {
+            showAlert('password-alert', 'error', 'All password fields are required.');
+            return;
+        }
+        if (newPwd !== confirm) {
+            showAlert('password-alert', 'error', 'New passwords do not match.');
+            return;
+        }
+        if (newPwd.length < 6) {
+            showAlert('password-alert', 'error', 'New password must be at least 6 characters.');
+            return;
+        }
+
+        const btn = document.getElementById('save-password-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Updating…';
+
+        try {
+            const res = await fetch(`${API}/api/patients/${PATIENT_ID}/password`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword: current, newPassword: newPwd })
+            });
+
+            if (res.ok) {
+                showAlert('password-alert', 'success', '✅ Password updated successfully.');
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            } else {
+                const txt = await res.text();
+                showAlert('password-alert', 'error', `❌ ${txt || 'Could not update password.'}`);
+            }
+        } catch {
+            showAlert('password-alert', 'error', '❌ Network error. Please try again.');
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = 'Update Password';
+    }
+    function togglePwd(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+    }
+}
+
+    // ── DELETE ACCOUNT ────────────────────────────────────
+    async function confirmDelete() {
+        if (!confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) return;
+        if (!confirm('Last warning — all your bookings will be cancelled. Continue?')) return;
+
+        try {
+            const res = await fetch(`${API}/api/patients/${PATIENT_ID}`, { method: 'DELETE' });
+            if (res.ok) {
+                document.getElementById('logout-form').submit();
+            } else {
+                showAlert('delete-alert', 'error', '❌ Could not delete account. Please try again.');
+            }
+        } catch {
+            showAlert('delete-alert', 'error', '❌ Network error. Please try again.');
+        }
+    }
+
+    function showAlert(containerId, type, msg) {
+        const el = document.getElementById(containerId);
+        el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+        if (type === 'success') setTimeout(() => el.innerHTML = '', 5000);
+    }
+</script>
+}
