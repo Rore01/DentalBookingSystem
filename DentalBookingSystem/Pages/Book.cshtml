@@ -172,7 +172,7 @@
     // ── TREATMENTS ────────────────────────────────────────
     async function loadTreatments() {
         try {
-            const res = await fetch(`http://localhost:5296/api/treatments?clinicId=${CLINIC_ID}`);
+            const res = await fetch(`http://localhost:5242/api/treatments?clinicId=${CLINIC_ID}`);
             const list = await res.json();
             document.getElementById('treatment-list').innerHTML = list.map(t => `
                 <div class="treatment-option" data-id="${t.id}" onclick="selectTreatment(${t.id},'${escHtml(t.name)}',${t.price},${t.durationMinutes})">
@@ -218,7 +218,7 @@
     async function loadAvailableDates() {
         document.getElementById('cal-title').textContent = 'Loading…';
         try {
-            const res = await fetch(`http://localhost:5296/api/availability/dates?clinicId=${CLINIC_ID}&treatmentId=${selectedTreatment.id}&year=${curYear}&month=${curMonth}`);
+            const res = await fetch(`http://localhost:5242/api/availability/dates?clinicId=${CLINIC_ID}&treatmentId=${selectedTreatment.id}&year=${curYear}&month=${curMonth}`);
             const data = await res.json();
             availableDates = new Set(data.availableDates ?? data);
         } catch { availableDates = new Set(); }
@@ -271,7 +271,7 @@
         document.getElementById('slots-title').textContent = `📅 ${MONTH_NAMES[curMonth-1]} ${day} — Available Times`;
         document.getElementById('slots-area').innerHTML = '<div class="hint">Loading…</div>';
         try {
-            const res = await fetch(`http://localhost:5296/api/availability/slots?clinicId=${CLINIC_ID}&treatmentId=${selectedTreatment.id}&date=${iso}`);
+            const res = await fetch(`http://localhost:5242/api/availability/slots?clinicId=${CLINIC_ID}&treatmentId=${selectedTreatment.id}&date=${iso}`);
             const data = await res.json();
             renderSlots(data.availableSlots ?? data);
         } catch {
@@ -335,7 +335,7 @@
         try {
             let res;
             if (RESCHEDULE_ID) {
-                res = await fetch(`http://localhost:5296/api/bookings/${RESCHEDULE_ID}`, {
+                res = await fetch(`http://localhost:5242/api/bookings/${RESCHEDULE_ID}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -344,7 +344,7 @@
                     })
                 });
             } else {
-                res = await fetch('http://localhost:5296/api/bookings', {
+                res = await fetch('http://localhost:5242/api/bookings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -405,7 +405,7 @@
 
     // ── SIGNALR ───────────────────────────────────────────
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl('http://localhost:5296/hubs/booking')
+        .withUrl('http://localhost:5242/hubs/booking')
         .withAutomaticReconnect()
         .build();
 

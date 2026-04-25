@@ -6,7 +6,7 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddHttpClient("DentaCareApi", client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5296");
+    client.BaseAddress = new Uri("http://localhost:5242");
 });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

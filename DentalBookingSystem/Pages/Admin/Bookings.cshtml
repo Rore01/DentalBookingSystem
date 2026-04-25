@@ -567,7 +567,7 @@
 @section Scripts {
     <script>
         const CLINIC_ID = @Model.ClinicId;
-        const API = 'http://localhost:5296';
+        const API = 'http://localhost:5242';
         let allBookings = [];
         let filtered = [];
         let managingId = null;
@@ -742,7 +742,7 @@
 
                 // ── SIGNALR ───────────────────────────────────────────
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl('http://localhost:5296/hubs/booking')
+            .withUrl('http://localhost:5242/hubs/booking')
             .withAutomaticReconnect()
             .build();
 
