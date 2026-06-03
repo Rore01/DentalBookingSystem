@@ -953,3 +953,112 @@ tr:hover td {
     cursor: pointer;
     margin-top: 24px;
 }
+
+
+/* ── FOOTER ── */
+.site-footer {
+    background: #0f2027;
+    color: rgba(255,255,255,0.75);
+    font-family: 'DM Sans', sans-serif;
+    margin-top: auto;
+    padding: 60px 0 0;
+}
+
+.footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px 40px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 48px;
+}
+
+.footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 12px;
+}
+
+    .footer-logo span {
+        color: #2aa896;
+    }
+
+.footer-brand p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 20px;
+    max-width: 280px;
+}
+
+.footer-social {
+    display: flex;
+    gap: 12px;
+}
+
+    .footer-social a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.7);
+        transition: background .2s, color .2s;
+        text-decoration: none;
+    }
+
+        .footer-social a:hover {
+            background: #2aa896;
+            color: white;
+        }
+
+.footer-col h4 {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.footer-col a {
+    display: block;
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: color .2s;
+}
+
+    .footer-col a:hover {
+        color: #2aa896;
+    }
+
+.footer-col p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+    .footer-col p a {
+        display: inline;
+        color: rgba(255,255,255,0.55);
+        margin-bottom: 0;
+    }
+
+        .footer-col p a:hover {
+            color: #2aa896;
+        }
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    padding: 20px 40px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+}

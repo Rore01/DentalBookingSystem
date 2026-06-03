@@ -15,6 +15,7 @@ public static class EndpointRegister
         new UpdatePatient().MapEndpoint(app);
         new ChangePassword().MapEndpoint(app);
         new DeletePatient().MapEndpoint(app);
+        new GetAllPatients().MapEndpoint(app);
 
         // Treatments
         new CreateTreatment().MapEndpoint(app);

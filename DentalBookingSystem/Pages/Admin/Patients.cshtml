@@ -157,35 +157,30 @@
     let allBookings = [];
     let filtered = [];
 
-    async function loadData() {
-        try {
-            const res = await fetch(`${API}/api/bookings?clinicId=${CLINIC_ID}`);
-            allBookings = await res.json();
+            async function loadData() {
+            try {
+                const [patientsRes, bookingsRes] = await Promise.all([
+                    fetch(`${API}/api/patients`),
+                    fetch(`${API}/api/bookings?clinicId=${CLINIC_ID}`)
+                ]);
 
-            const patientMap = new Map();
-            allBookings.forEach(b => {
-                if (!b.patientId) return;
-                if (!patientMap.has(b.patientId)) {
-                    patientMap.set(b.patientId, {
-                        id: b.patientId,
-                        name: b.patientName ?? 'Unknown',
-                        email: b.patientEmail ?? '—',
-                        phone: b.patientPhone ?? '—',
-                        bookings: []
-                    });
-                }
-                patientMap.get(b.patientId).bookings.push(b);
-            });
+                const patients = await patientsRes.json();
+                allBookings = await bookingsRes.json();
 
-            allPatients = Array.from(patientMap.values())
-                .sort((a, b) => a.name.localeCompare(b.name));
+                allPatients = patients.map(p => ({
+                    id: p.id,
+                    name: `${p.firstName} ${p.lastName}`,
+                    email: p.email,
+                    phone: p.phone ?? '—',
+                    bookings: allBookings.filter(b => b.patientId === p.id)
+                }));
 
-            applyFilter();
-        } catch {
-            document.getElementById('table-area').innerHTML =
-                '<div class="empty-state"><div class="empty-icon">❌</div>Could not load patients.</div>';
+                applyFilter();
+            } catch {
+                document.getElementById('table-area').innerHTML =
+                    '<div class="empty-state"><div class="empty-icon">❌</div>Could not load patients.</div>';
+            }
         }
-    }
 
     function applyFilter() {
         const q = document.getElementById('search').value.toLowerCase();

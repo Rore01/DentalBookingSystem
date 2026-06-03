@@ -3,21 +3,19 @@
 public class DeletePatient : IEndpointMapper
 {
     public async Task<IResult> Handle(
-        int id,
-        AppDbContext db,
-        CancellationToken ct)
+    int id,
+    AppDbContext db,
+    CancellationToken ct)
     {
         var patient = await db.Patients.FindAsync([id], ct);
         if (patient is null)
             return Results.NotFound("Patient not found.");
 
-        var upcomingBookings = await db.Bookings
-            .Where(b => b.PatientId == id && b.Status != BookingStatus.Cancelled)
+        var bookings = await db.Bookings
+            .Where(b => b.PatientId == id)
             .ToListAsync(ct);
 
-        foreach (var booking in upcomingBookings)
-            booking.Status = BookingStatus.Cancelled;
-
+        db.Bookings.RemoveRange(bookings);
         db.Patients.Remove(patient);
         await db.SaveChangesAsync(ct);
 

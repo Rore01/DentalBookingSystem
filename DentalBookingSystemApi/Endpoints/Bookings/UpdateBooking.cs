@@ -18,9 +18,14 @@ public class UpdateBooking : IEndpointMapper
         int id,
         StatusRequest req,
         AppDbContext db,
+        EmailService email,
         CancellationToken ct)
     {
-        var booking = await db.Bookings.FindAsync([id], ct);
+        var booking = await db.Bookings
+            .Include(b => b.Patient)
+            .Include(b => b.Treatment)
+            .FirstOrDefaultAsync(b => b.Id == id, ct);
+
         if (booking is null)
             return Results.NotFound("Booking not found.");
 
@@ -29,6 +34,18 @@ public class UpdateBooking : IEndpointMapper
 
         booking.Status = newStatus;
         await db.SaveChangesAsync(ct);
+
+        if (newStatus == BookingStatus.Cancelled)
+        {
+            try
+            {
+                await email.SendCancellationAsync(booking.Patient, booking, booking.Treatment);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CANCELLATION EMAIL ERROR: {ex.Message}");
+            }
+        }
 
         return Results.Ok(new StatusResponse(booking.Id, booking.Status));
     }

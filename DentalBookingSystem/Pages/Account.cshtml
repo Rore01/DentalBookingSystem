@@ -206,10 +206,8 @@
             });
 
             if (res.ok) {
-                showAlert('password-alert', 'success', '✅ Password updated successfully.');
-                document.getElementById('currentPassword').value = '';
-                document.getElementById('newPassword').value = '';
-                document.getElementById('confirmPassword').value = '';
+                showAlert('password-alert', 'success', '✅ Password updated! Logging you out…');
+                setTimeout(() => document.getElementById('logout-form').submit(), 1500);
             } else {
                 const txt = await res.text();
                 showAlert('password-alert', 'error', `❌ ${txt || 'Could not update password.'}`);
@@ -233,21 +231,31 @@
 }
 
     // ── DELETE ACCOUNT ────────────────────────────────────
-    async function confirmDelete() {
-        if (!confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) return;
-        if (!confirm('Last warning — all your bookings will be cancelled. Continue?')) return;
+        async function confirmDelete() {
+            if (!confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) return;
+            if (!confirm('Last warning — all your bookings will be cancelled. Continue?')) return;
 
-        try {
-            const res = await fetch(`${API}/api/patients/${PATIENT_ID}`, { method: 'DELETE' });
-            if (res.ok) {
-                document.getElementById('logout-form').submit();
-            } else {
-                showAlert('delete-alert', 'error', '❌ Could not delete account. Please try again.');
+            const btn = document.querySelector('.btn-danger');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner" style="border-top-color:#c0392b;border-color:rgba(192,57,43,0.3);"></span>Deleting…';
+
+            try {
+                const res = await fetch(`${API}/api/patients/${PATIENT_ID}`, { method: 'DELETE' });
+                if (res.ok) {
+                    showAlert('delete-alert', 'success', '✅ Account deleted. Redirecting…');
+                    setTimeout(() => document.getElementById('logout-form').submit(), 1500);
+                } else {
+                    const txt = await res.text();
+                    showAlert('delete-alert', 'error', `❌ ${txt || 'Could not delete account. Please try again.'}`);
+                    btn.disabled = false;
+                    btn.innerHTML = 'Delete My Account';
+                }
+            } catch {
+                showAlert('delete-alert', 'error', '❌ Network error. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = 'Delete My Account';
             }
-        } catch {
-            showAlert('delete-alert', 'error', '❌ Network error. Please try again.');
         }
-    }
 
     function showAlert(containerId, type, msg) {
         const el = document.getElementById(containerId);

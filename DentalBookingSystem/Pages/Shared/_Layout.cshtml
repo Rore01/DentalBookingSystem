@@ -23,7 +23,7 @@
             }
             else
             {
-                <a asp-page="/Services" class="@(ViewData["ActivePage"]?.ToString() == "Services" ? "active" : "")">Services</a>
+                <a asp-page="/MyBookings" class="@(ViewData["ActivePage"]?.ToString() == "MyBookings" ? "active" : "")">My Bookings</a>
                 <a asp-page="/Book" class="@(ViewData["ActivePage"]?.ToString() == "Book" ? "active" : "")">Book Appointment</a>
             }
         </div>
@@ -32,7 +32,7 @@
             {
                 @if (User.FindFirst("Role")?.Value != "Admin")
                 {
-                    <a asp-page="/MyBookings" class="nav-login">My Bookings</a>
+                    <a asp-page="/Account" class="nav-login">Account</a>
                 }
                 <form asp-page="/Account/Logout" method="post" style="display:inline">
                     <button type="submit" class="btn-sm">Log out</button>
@@ -46,8 +46,51 @@
         </div>
 </nav>
 
-@RenderBody()
+    @RenderBody()
 
-@await RenderSectionAsync("Scripts", required: false)
+    @if (User.FindFirst("Role")?.Value != "Admin")
+    {
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <div class="footer-logo">Denta<span>Care</span></div>
+                    <p>Your trusted dental clinic online. Book, manage and reschedule your appointments — anytime, anywhere.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>
+                        </a>
+                        <a href="#" aria-label="Instagram">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
+                        </a>
+                        <a href="#" aria-label="Twitter/X">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <a asp-page="/Index">Home</a>
+                    <a asp-page="/Services">Services</a>
+                    <a asp-page="/Book">Book Appointment</a>
+                    <a asp-page="/MyBookings">My Bookings</a>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <p>📍 Tandläkarvägen 12, Stockholm</p>
+                    <p>📞 <a href="tel:+46700000000">+46 70 000 00 00</a></p>
+                    <p>✉️ <a href="mailto:clinic@dentacare.se">clinic@dentacare.se</a></p>
+                    <p>🕐 Mon–Fri: 08:00 – 17:00</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© @DateTime.Now.Year DentaCare. All rights reserved.</p>
+            </div>
+        </footer>
+    }
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
